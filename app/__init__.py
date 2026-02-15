@@ -1,9 +1,9 @@
 # Initializes the Flask application
 # Registers blueprints and shared configuration
 
-# used to read environmental variables
+# Used to read environmental variables
 import os
-from flask import Flask
+from flask import Flask, redirect, url_for
 
 def create_app():
     # Creates and configures the Flask app, then registers blueprints
@@ -13,8 +13,13 @@ def create_app():
      # If it’s not set, it can cause issues, so use a temporary fallback
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "replace_later")
 
+    from app.auth.routes import auth_bp
+    # Register blueprint with the Flask app so routes defined in auth_bp become active
+    app.register_blueprint(auth_bp)
+
     @app.get("/")
     def index():
-        return {"status": "ok"}
+        # Redirect root URL to login page
+        return redirect(url_for("auth.login"))
 
     return app
