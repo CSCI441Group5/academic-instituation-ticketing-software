@@ -1,7 +1,7 @@
 # URL routes
 
 from flask import Blueprint, redirect, render_template, request, url_for
-from app.database import save_ticket
+from app.database import save_ticket, connect_db
 
 # Create a blueprint named "auth"
 # The name is used for URL building (url_for("auth.login"))
@@ -20,7 +20,23 @@ def login():
 
 @auth_bp.route("/dashboard")
 def dashboard():
-    return render_template("dashboard.html")
+    # Pull all tickets from database so dashboard can render current data
+    connection = connect_db()
+    
+    try:
+        tickets = connection.execute(
+            """
+            SELECT id, category, description, status, created_at
+            FROM tickets
+            ORDER BY id DESC
+            """
+        ).fetchall()
+    finally:
+        # Always close DB connection after query
+        connection.close()
+
+    # Pass tickets list to dashboard template
+    return render_template("dashboard.html", tickets=tickets)
 
 @auth_bp.route("/tickets/new", methods=["GET", "POST"])
 def new_ticket():

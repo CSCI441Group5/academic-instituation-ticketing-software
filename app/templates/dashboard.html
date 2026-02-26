@@ -11,17 +11,23 @@
     </head>
     <body>
         <h1>My Tickets</h1>
+        <p>
+            <a href="{{ url_for('auth.new_ticket') }}">
+                <button type="button">Create New Ticket</button>
+            </a>
+        </p>
 
-        <p>Submission Date: 2/4/2026</p>
-        <p>Status: Not Complete - ETA 1 HR</p>
-        <p>Priority: Medium</p>
-        <p>Department: Technology - John Doe</p>
-        <p>Name: Broke Laptop</p>
-        <p>Description: Laptop will not power on</p>
+        <!-- If tickets exist, render each one -->
+        {% if tickets %} {% for ticket in tickets %}
+        <hr />
+        <p><strong>Ticket #{{ ticket["id"] }}</strong></p>
+        <p>Submission Date: {{ ticket["created_at"] }}</p>
+        <p>Status: {{ ticket["status"] }}</p>
+        <p>Category: {{ ticket["category"] }}</p>
+        <p>Description: {{ ticket["description"] }}</p>
+        {% endfor %} {% else %}
+        <!-- Shown when no tickets have been submitted yet -->
+        <p>No tickets submitted yet.</p>
+        {% endif %}
     </body>
-    <p>
-        <a href="{{ url_for('auth.new_ticket') }}">
-            <button type="button">Create New Ticket</button>
-        </a>
-    </p>
 </html>
