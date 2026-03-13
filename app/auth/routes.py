@@ -1,7 +1,9 @@
 # URL routes
 
 from flask import Blueprint, redirect, render_template, request, url_for
-from app.database import save_ticket, connect_db
+import app.database
+import app.tickets
+
 
 # Create a blueprint named "auth"
 # The name is used for URL building (url_for("auth.login"))
@@ -18,11 +20,16 @@ def login():
     # render_template looks inside app/templates/
     return render_template("login.html")
 
+
 @auth_bp.route("/dashboard")
 def dashboard():
     # Pull all tickets from database so dashboard can render current data
-    connection = connect_db()
-    
+    connection = app.database.connect_db()
+    status_filter = request.args.get("status_filter", "")
+    category_filter = request.args.get("category_filter", "")
+    date_before = request.args.get("date_before", "")
+    date_after = request.args.get("date_after", "")
+
     try:
         tickets = connection.execute(
             """
@@ -31,12 +38,22 @@ def dashboard():
             ORDER BY id DESC
             """
         ).fetchall()
+        filtered = tickets
+
+        filtered = app.tickets.search_tickets(
+            tickets, (status_filter, category_filter, date_before, date_after))
+
     finally:
         # Always close DB connection after query
         connection.close()
 
     # Pass tickets list to dashboard template
-    return render_template("dashboard.html", tickets=tickets)
+    return render_template("dashboard.html", tickets=filtered,
+                           status_filter=status_filter,
+                           category_filter=category_filter,
+                           date_before=date_before,
+                           date_after=date_after)
+
 
 @auth_bp.route("/tickets/new", methods=["GET", "POST"])
 def new_ticket():
@@ -56,7 +73,7 @@ def new_ticket():
             error = "Category and description are required."
         else:
             # Save new ticket and redirect so refresh does not resubmit form
-            new_id = save_ticket(
+            new_id = app.database.save_ticket(
                 {
                     "category": category,
                     "description": description,
@@ -74,3 +91,12 @@ def new_ticket():
         success=success,
         ticket_id=ticket_id,
     )
+
+
+@auth_bp.route("/tickets/<int:ticket_id>/update", methods=["POST"])
+def update_ticket(ticket_id):
+    status = request.form["status"]
+    description = request.form["description"]
+
+    app.database.update_ticket(ticket_id, status, description)
+    return redirect(url_for("auth.dashboard"))

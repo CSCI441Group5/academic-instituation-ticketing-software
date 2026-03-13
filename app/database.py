@@ -9,6 +9,7 @@ from pathlib import Path
 # Build the full path to the database file.
 DB_PATH = Path(__file__).resolve().parent.parent / "instance" / "tickets.db"
 
+
 def _ensure_schema(connection: sqlite3.Connection) -> None:
     """Create the tickets table if it does not already exist"""
 
@@ -27,6 +28,7 @@ def _ensure_schema(connection: sqlite3.Connection) -> None:
 
     connection.commit()
 
+
 def connect_db():
     """Establish connection."""
 
@@ -34,7 +36,7 @@ def connect_db():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(DB_PATH)
 
-    # This lets us access row values by column name instead of index. 
+    # This lets us access row values by column name instead of index.
     # Example: row["category"] instead of row[1]
     connection.row_factory = sqlite3.Row
 
@@ -74,11 +76,39 @@ def save_ticket(ticket_data):
         # Always close database connection
         connection.close()
 
-def update_ticket(ticket_id, data):
+
+def update_ticket(ticket_id, status, description=""):
     """Update ticket."""
+
+    try:
+        connection = connect_db()
+
+        cursor = connection.execute("UPDATE tickets SET status = ?, description = ? WHERE id = ?",
+                                    (status, description, ticket_id)
+                                    )
+
+        connection.commit()
+
+        return cursor.fetchone()
+    finally:
+        connection.close()
+
 
 def get_ticket(ticket_id):
     """Retrieve ticket data."""
+
+    try:
+        connection = connect_db()
+
+        cursor = connection.execute(
+            "SELECT * FROM tickets WHERE id = ?",
+            (ticket_id)
+        )
+
+        return cursor.fetchone()
+    finally:
+        connection.close()
+
 
 def log_event(event_data):
     """Log system errors."""
