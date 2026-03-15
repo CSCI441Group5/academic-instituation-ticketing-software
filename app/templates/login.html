@@ -1,4 +1,4 @@
-<!-- Base html file for UI -->
+<!-- Base html file for application login entry -->
 
 <!doctype html>
 <html lang="en">
@@ -6,27 +6,18 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Login - Automated School Ticketing System</title>
-        <!-- Loads the CSS file from Flask’s static folder -->
         <link
             rel="stylesheet"
-            href="{{ url_for('static', filename='styles.css') }}"
+            href="{{ url_for('static', filename='css/styles.css') }}"
         />
     </head>
     <body>
         <section class="login-menu">
-        <h1 id="login-header">Login</h1>
-        <form action="/login" method="POST" class="login-form">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required /><br /><br />
-            <label for="password">Password:</label>
-            <input
-                type="password"
-                id="password"
-                name="password"
-                required
-            /><br /><br />
-            <button type="submit" id="login-button">Sign In</button>
-        </form>
+            <h1 id="login-header">Login</h1>
+            <!-- Link users to the separate university login page -->
+            <a href="{{ url_for('auth.university_login') }}" id="login-button">
+                Sign in with University Credentials
+            </a>
         </section>
     </body>
 </html>

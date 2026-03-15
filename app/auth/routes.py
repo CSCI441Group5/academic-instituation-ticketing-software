@@ -10,15 +10,24 @@ import app.tickets
 auth_bp = Blueprint("auth", __name__)
 
 
-@auth_bp.route("/login", methods=["GET", "POST"])
+@auth_bp.get("/login")
 def login():
-    # On submit (POST), skip auth checks (for now) and send the user to dashboard
-    if request.method == "POST":
-        return redirect(url_for("auth.dashboard"))
-
-    # When user visits /login, Flask renders login.html
-    # render_template looks inside app/templates/
+    # When user visits /login, render the app-side entry page
+    # This page links out to the separate university login screen
     return render_template("login.html")
+
+
+@auth_bp.get("/university-login")
+def university_login():
+    # Render the fictional university identity-provider style page
+    return render_template("university_login.html")
+
+
+@auth_bp.post("/auth/login")
+def login_submit():
+    # Placeholder sign-in route until a real identity provider flow is added
+    # Redirect to dashboard so the UI can be tested without authentication
+    return redirect(url_for("auth.dashboard"))
 
 
 @auth_bp.route("/dashboard")
