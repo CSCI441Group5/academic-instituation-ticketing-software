@@ -1,5 +1,11 @@
 /* styles for login page */
 
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+}
 
 .login-menu {
     background-color: #f0f0f0;
@@ -11,6 +17,7 @@
     margin-left: auto;
     margin-right: auto;
     font-family: sans-serif;
+    text-align: center;
 }
 
 #login-header {
@@ -26,16 +33,15 @@
 }
 
 #login-button {
-    background-color: #4CAF50;
+    display: inline-block;
+    background-color: #4caf50;
     color: white;
     padding: 10px 15px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    width: 20%;
-    margin-left: auto;
-    margin-right: auto;
-    min-width: 150px;
+    min-width: 260px;
+    text-decoration: none;
 }
 
 #login-button:hover {
