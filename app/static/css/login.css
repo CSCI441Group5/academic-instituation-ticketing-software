@@ -1,0 +1,228 @@
+/* styles for university login page */
+
+:root {
+    --parkfield-navy: #173456;
+    --parkfield-blue: #1f67c7;
+    --parkfield-blue-dark: #1854a4;
+    --parkfield-border: #cfcfcf;
+    --parkfield-text: #1f2937;
+    --parkfield-muted: #666666;
+    --parkfield-surface: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body.login-page {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--parkfield-text);
+    background: #ffffff;
+}
+
+/* main two-column layout */
+.login-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(420px, 0.75fr);
+    min-height: 100vh;
+}
+
+/* hero image panel */
+.login-hero {
+    position: relative;
+    background-image: url("../images/university login background.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    isolation: isolate;
+}
+
+.login-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0));
+    z-index: -1;
+}
+
+/* sign in panel and brand block */
+.login-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 4.5rem;
+    padding: 3.25rem 4.5rem 3rem 4.5rem;
+    background-color: #ffffff;
+}
+
+.login-brand {
+    width: min(100%, 23rem);
+}
+
+.login-brand__logo {
+    width: min(100%, 21rem);
+    height: auto;
+    display: block;
+}
+
+/* login card and form controls */
+.login-card {
+    width: min(100%, 31.5rem);
+    padding: 2.1rem 1.8rem 1.75rem;
+    border: 1px solid var(--parkfield-border);
+    border-radius: 0;
+    background: var(--parkfield-surface);
+    box-shadow: none;
+}
+
+.login-card__title {
+    margin: 0;
+    font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+    line-height: 1.35;
+    font-weight: 400;
+    color: #383838;
+}
+
+.login-card__subheader {
+    margin: 0.15rem 0 0;
+    font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+    line-height: 1.35;
+    font-weight: 400;
+    color: #383838;
+}
+
+.login-card__example {
+    margin: 2rem 0 0;
+    font-size: 0.9rem;
+    color: #4f4f4f;
+    line-height: 1.45;
+    font-weight: 600;
+}
+
+.login-form {
+    display: grid;
+    gap: 0.85rem;
+    margin-top: 0.6rem;
+}
+
+.login-form label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 0.95rem 0.95rem;
+    border: 1px solid #cfcfcf;
+    border-radius: 3px;
+    background: #ffffff;
+    color: var(--parkfield-text);
+    font: inherit;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+}
+
+.login-form input::placeholder {
+    color: #c1c1c1;
+    font-style: italic;
+}
+
+.login-form input:focus {
+    outline: none;
+    border-color: var(--parkfield-blue);
+}
+
+.login-form button {
+    margin-top: 1.35rem;
+    width: fit-content;
+    min-width: 120px;
+    padding: 0.9rem 1.6rem;
+    border: 0;
+    border-radius: 3px;
+    background: #2a67c7;
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.18s ease;
+    box-shadow: none;
+}
+
+.login-form button:hover {
+    background: var(--parkfield-blue-dark);
+}
+
+.login-form button:focus-visible {
+    outline: 3px solid rgba(31, 103, 199, 0.2);
+    outline-offset: 2px;
+}
+
+.login-divider {
+    margin: 2rem 0 1.55rem;
+    border: 0;
+    border-top: 1px solid #dddddd;
+}
+
+.login-links {
+    display: grid;
+    gap: 1rem;
+}
+
+.login-links a {
+    color: var(--parkfield-blue);
+    text-decoration: none;
+    font-size: 0.98rem;
+}
+
+.login-links a:hover {
+    text-decoration: underline;
+}
+
+/* stack the layout vertically on smaller screens */
+@media (max-width: 1100px) {
+    .login-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .login-hero {
+        min-height: 44vh;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .login-panel {
+        gap: 2rem;
+        padding: 2rem 1.25rem 2.5rem;
+    }
+
+    .login-card {
+        width: 100%;
+    }
+}
+
+/* Reduce spacing and scale for narrow mobile screens */
+@media (max-width: 600px) {
+    .login-panel {
+        padding: 1.5rem 1rem 2rem;
+    }
+
+    .login-brand__logo {
+        width: min(100%, 15rem);
+    }
+
+    .login-card {
+        padding: 1.4rem 1rem 1.2rem;
+    }
+
+    .login-card__example {
+        margin-top: 1.3rem;
+    }
+}
