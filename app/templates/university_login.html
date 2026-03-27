@@ -1,0 +1,92 @@
+<!-- Base html file for University login UI -->
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Parkfield University Sign In</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/login.css') }}"
+        />
+    </head>
+    <body class="login-page">
+        <main class="login-shell">
+            <!-- Left column with campus background image -->
+            <section
+                class="login-hero"
+                aria-label="Parkfield University campus"
+            >
+                <div class="login-hero__overlay"></div>
+            </section>
+
+            <!-- Right column with logo, sign-in card, and support links -->
+            <section class="login-panel">
+                <div class="login-brand">
+                    <img
+                        class="login-brand__logo"
+                        src="{{ url_for('static', filename='images/university logo.png') }}"
+                        alt="Parkfield University logo"
+                    />
+                </div>
+
+                <div class="login-card">
+                    <h1 class="login-card__title">ParkfieldNetID Sign In</h1>
+                    <p class="login-card__subheader">
+                        Sign in with your ParkfieldNetID email address and
+                        password
+                    </p>
+                    <p class="login-card__example">
+                        (Example: @parkfield.edu, @mail.parkfield.edu)
+                    </p>
+
+                    {% if error %}
+                    <!-- Show sign-in error without changing the overall layout -->
+                    <p class="login-error">{{ error }}</p>
+                    {% endif %}
+
+                    <!-- Submit to the mock university authentication route -->
+                    <form
+                        action="{{ url_for('auth.login_submit') }}"
+                        method="POST"
+                        class="login-form"
+                    >
+                        <label for="email">Parkfield email address</label>
+                        <!-- Keep the submitted email after a failed sign in -->
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="name@parkfield.edu"
+                            value="{{ email|default('', true) }}"
+                            autocomplete="username"
+                            required
+                        />
+
+                        <label for="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        />
+
+                        <button type="submit">Sign in</button>
+                    </form>
+
+                    <hr class="login-divider" />
+
+                    <!-- Support actions shown below the form -->
+                    <div class="login-links">
+                        <a href="#">First time signing in?</a>
+                        <a href="#">Reset or update your password</a>
+                        <a href="#">Need help?</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </body>
+</html>

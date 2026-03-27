@@ -1,6 +1,7 @@
 # URL routes
 
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, redirect, render_template, request, session, url_for
+import app.auth.service
 import app.database
 import app.tickets
 
@@ -10,15 +11,45 @@ import app.tickets
 auth_bp = Blueprint("auth", __name__)
 
 
-@auth_bp.route("/login", methods=["GET", "POST"])
+@auth_bp.get("/login")
 def login():
-    # On submit (POST), skip auth checks (for now) and send the user to dashboard
-    if request.method == "POST":
-        return redirect(url_for("auth.dashboard"))
-
-    # When user visits /login, Flask renders login.html
-    # render_template looks inside app/templates/
+    # When user visits /login, render the app-side entry page
+    # This page links out to the separate university login screen
     return render_template("login.html")
+
+
+@auth_bp.get("/university-login")
+def university_login():
+    # Render the fictional university identity-provider style page
+    return render_template("university_login.html")
+
+
+@auth_bp.post("/auth/login")
+def login_submit():
+    # Authenticate against the mock university account table
+    # Pull submitted credentials from the university sign in form
+    email = request.form.get("email", "").strip()
+    password = request.form.get("password", "")
+
+    account, error = app.auth.service.authenticate_mock_university_account(
+        email, password
+    )
+
+    # Re-render the login page with an error if credentials are invalid
+    if error:
+        # Keep the current page and show the validation error
+        return render_template(
+            "university_login.html",
+            error=error,
+            email=email,
+        ), 401
+
+    # Store a minimal mock user session so the sign-in can be tracked later
+    session["mock_university_account_id"] = account.id
+    session["mock_university_email"] = account.email
+    session["mock_university_full_name"] = account.full_name
+
+    return redirect(url_for("auth.dashboard"))
 
 
 @auth_bp.route("/dashboard")
