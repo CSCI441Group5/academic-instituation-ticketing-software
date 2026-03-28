@@ -33,7 +33,8 @@ def _ensure_schema(connection: sqlite3.Connection) -> None:
             id INTEGER PRIMARY KEY AUTOINCREMENT,      -- unique account ID
             email TEXT NOT NULL UNIQUE,                -- university email
             password_hash TEXT NOT NULL,
-            full_name TEXT NOT NULL
+            full_name TEXT NOT NULL,
+            role TEXT NOT NULL
         )
         """
     )
@@ -98,7 +99,7 @@ def get_mock_university_account_by_email(email):
         # Match email case-insensitively so submitted form values are flexible
         cursor = connection.execute(
             """
-            SELECT id, email, password_hash, full_name
+            SELECT id, email, password_hash, full_name, role
             FROM MockUniversityAccount
             WHERE lower(email) = lower(?)
             """,
@@ -119,14 +120,15 @@ def save_mock_university_account(account_data):
         # Insert account only when the email does not already exist
         connection.execute(
             """
-            INSERT OR IGNORE INTO MockUniversityAccount
-            (email, password_hash, full_name)
-            VALUES (?, ?, ?)
+            INSERT OR REPLACE INTO MockUniversityAccount
+            (email, password_hash, full_name, role)
+            VALUES (?, ?, ?, ?)
             """,
             (
                 account_data["email"],
                 account_data["password_hash"],
                 account_data["full_name"],
+                account_data["role"]
             ),
         )
 

@@ -24,7 +24,7 @@ def university_login():
     return render_template("university_login.html")
 
 
-@auth_bp.post("/auth/login")
+@auth_bp.post("/auth/login_submit")
 def login_submit():
     # Authenticate against the mock university account table
     # Pull submitted credentials from the university sign in form
@@ -36,7 +36,7 @@ def login_submit():
     )
 
     # Re-render the login page with an error if credentials are invalid
-    if error:
+    if error or account is None:
         # Keep the current page and show the validation error
         return render_template(
             "university_login.html",
@@ -48,6 +48,7 @@ def login_submit():
     session["mock_university_account_id"] = account.id
     session["mock_university_email"] = account.email
     session["mock_university_full_name"] = account.full_name
+    session["mock_university_role"] = account.role
 
     return redirect(url_for("auth.dashboard"))
 

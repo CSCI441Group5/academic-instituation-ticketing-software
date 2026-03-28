@@ -82,7 +82,9 @@
                 <p>Status: {{ ticket["status"] }}</p>
                 <p>Category: {{ ticket["category"] }}</p>
                 <p>Description: {{ ticket["description"] }}</p>
-                <button onclick="window.location='?edit={{ ticket.id }}'">Edit</button>
+                {% if session.get("mock_university_role") != "student" %}
+                    <button onclick="window.location='?edit={{ ticket.id }}'">Edit</button>
+                {% endif %}
             {% endif %}
         {% endfor %} {% else %}
             <!-- Shown when no tickets have been submitted yet -->

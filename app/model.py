@@ -16,11 +16,12 @@ class Ticket:
 
 # Mock university account model for the university identity provider.
 class MockUniversityAccount:
-    def __init__(self, account_id, email, password_hash, full_name):
+    def __init__(self, account_id, email, password_hash, full_name, role):
         self.id = account_id
         self.email = email
         self.password_hash = password_hash
         self.full_name = full_name
+        self.role = role
 
     @classmethod
     def from_row(cls, row):
@@ -31,4 +32,5 @@ class MockUniversityAccount:
             row["email"],
             row["password_hash"],
             row["full_name"],
+            row["role"]
         )
