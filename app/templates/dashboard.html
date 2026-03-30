@@ -10,6 +10,7 @@
         />
     </head>
     <body>
+        <h2>Signed in as: {{session.get("mock_university_role")}}</h2>
         <h1>My Tickets</h1>
         <p>
             <a href="{{ url_for('auth.new_ticket') }}">
