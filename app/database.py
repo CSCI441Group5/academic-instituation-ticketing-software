@@ -17,6 +17,7 @@ def _ensure_schema(connection: sqlite3.Connection) -> None:
         """
         CREATE TABLE IF NOT EXISTS tickets (
             id INTEGER PRIMARY KEY AUTOINCREMENT,               -- unique ticket ID
+            title TEXT NOT NULL,                                -- short ticket summary
             category TEXT NOT NULL,                             -- type of issue
             description TEXT NOT NULL,                          -- details about the problem
             attachment TEXT,                                    -- file path or attachment reference
@@ -71,15 +72,17 @@ def save_ticket(ticket_data):
         cursor = connection.execute(
             """
             INSERT INTO tickets (
+                title,
                 category,
                 description,
                 attachment,
                 requester_account_id,
                 status
             )
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?)
             """,
             (
+                ticket_data["title"],                  # required
                 ticket_data["category"],               # required
                 ticket_data["description"],            # required
                 ticket_data.get("attachment"),         # optional

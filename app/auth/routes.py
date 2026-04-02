@@ -65,7 +65,7 @@ def dashboard():
     try:
         tickets = connection.execute(
             """
-            SELECT id, category, description, status, created_at
+            SELECT id, title, category, description, status, created_at
             FROM tickets
             ORDER BY id DESC
             """
@@ -96,17 +96,19 @@ def new_ticket():
 
     if request.method == "POST":
         # Pull and sanitize form values
+        title = request.form.get("title", "").strip()
         category = request.form.get("category", "").strip()
         description = request.form.get("description", "").strip()
         attachment = request.form.get("attachment", "").strip()
 
-        if not category or not description:
+        if not title or not category or not description:
             # Basic required-field check before DB insert
-            error = "Category and description are required."
+            error = "Title, category, and description are required."
         else:
             # Save new ticket and redirect so refresh does not resubmit form
             new_id = app.database.save_ticket(
                 {
+                    "title": title,
                     "category": category,
                     "description": description,
                     "attachment": attachment or None,
