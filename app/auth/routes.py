@@ -26,12 +26,12 @@ def university_login():
 
 @auth_bp.post("/auth/login_submit")
 def login_submit():
-    # Authenticate against the mock university account table
+    # Authenticate against the university account table
     # Pull submitted credentials from the university sign in form
     email = request.form.get("email", "").strip()
     password = request.form.get("password", "")
 
-    account, error = app.auth.service.authenticate_mock_university_account(
+    account, error = app.auth.service.authenticate_university_account(
         email, password
     )
 
@@ -44,11 +44,11 @@ def login_submit():
             email=email,
         ), 401
 
-    # Store a minimal mock user session so the sign-in can be tracked later
-    session["mock_university_account_id"] = account.id
-    session["mock_university_email"] = account.email
-    session["mock_university_full_name"] = account.full_name
-    session["mock_university_role"] = account.role
+    # Store a minimal user session so the sign-in can be tracked later
+    session["user_account_id"] = account.id
+    session["user_email"] = account.email
+    session["user_full_name"] = account.full_name
+    session["user_role"] = account.role
 
     return redirect(url_for("auth.dashboard"))
 
@@ -65,7 +65,7 @@ def dashboard():
     try:
         tickets = connection.execute(
             """
-            SELECT id, category, description, status, created_at
+            SELECT id, title, category, description, status, created_at
             FROM tickets
             ORDER BY id DESC
             """
@@ -96,20 +96,23 @@ def new_ticket():
 
     if request.method == "POST":
         # Pull and sanitize form values
+        title = request.form.get("title", "").strip()
         category = request.form.get("category", "").strip()
         description = request.form.get("description", "").strip()
         attachment = request.form.get("attachment", "").strip()
 
-        if not category or not description:
+        if not title or not category or not description:
             # Basic required-field check before DB insert
-            error = "Category and description are required."
+            error = "Title, category, and description are required."
         else:
             # Save new ticket and redirect so refresh does not resubmit form
             new_id = app.database.save_ticket(
                 {
+                    "title": title,
                     "category": category,
                     "description": description,
                     "attachment": attachment or None,
+                    "requester_account_id": session.get("user_account_id"),
                     "status": "Pending",
                 }
             )

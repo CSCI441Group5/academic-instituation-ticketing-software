@@ -14,8 +14,8 @@ class Ticket:
         self.description = description
         self.status = status
 
-# Mock university account model for the university identity provider.
-class MockUniversityAccount:
+# University account model used by the local identity flow.
+class UniversityAccount:
     def __init__(self, account_id, email, password_hash, full_name, role):
         self.id = account_id
         self.email = email

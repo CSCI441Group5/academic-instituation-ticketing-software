@@ -17,19 +17,21 @@ def _ensure_schema(connection: sqlite3.Connection) -> None:
         """
         CREATE TABLE IF NOT EXISTS tickets (
             id INTEGER PRIMARY KEY AUTOINCREMENT,               -- unique ticket ID
+            title TEXT NOT NULL,                                -- short ticket summary
             category TEXT NOT NULL,                             -- type of issue
             description TEXT NOT NULL,                          -- details about the problem
             attachment TEXT,                                    -- file path or attachment reference
+            requester_account_id INTEGER,                       -- linked university account
             status TEXT NOT NULL DEFAULT 'Pending',             -- ticket state (default = Pending)
             created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP  -- auto timestamp
         )
         """
     )
 
-    # Create mock university accounts table
+    # Create university accounts table
     connection.execute(
         """
-        CREATE TABLE IF NOT EXISTS MockUniversityAccount (
+        CREATE TABLE IF NOT EXISTS UniversityAccount (
             id INTEGER PRIMARY KEY AUTOINCREMENT,      -- unique account ID
             email TEXT NOT NULL UNIQUE,                -- university email
             password_hash TEXT NOT NULL,
@@ -69,13 +71,22 @@ def save_ticket(ticket_data):
         # Insert ticket data into the database
         cursor = connection.execute(
             """
-            INSERT INTO tickets (category, description, attachment, status)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO tickets (
+                title,
+                category,
+                description,
+                attachment,
+                requester_account_id,
+                status
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
             """,
             (
+                ticket_data["title"],                  # required
                 ticket_data["category"],               # required
                 ticket_data["description"],            # required
                 ticket_data.get("attachment"),         # optional
+                ticket_data.get("requester_account_id"),
                 ticket_data.get("status", "Pending"),  # default if missing
             ),
         )
@@ -90,8 +101,21 @@ def save_ticket(ticket_data):
         connection.close()
 
 
-def get_mock_university_account_by_email(email):
-    """Retrieve mock university account by email address."""
+def get_ticket_count():
+    """Return the current number of ticket rows."""
+
+    connection = connect_db()
+
+    try:
+        cursor = connection.execute("SELECT COUNT(*) AS count FROM tickets")
+        row = cursor.fetchone()
+        return row["count"]
+    finally:
+        connection.close()
+
+
+def get_university_account_by_email(email):
+    """Retrieve university account by email address."""
 
     connection = connect_db()
 
@@ -100,7 +124,7 @@ def get_mock_university_account_by_email(email):
         cursor = connection.execute(
             """
             SELECT id, email, password_hash, full_name, role
-            FROM MockUniversityAccount
+            FROM UniversityAccount
             WHERE lower(email) = lower(?)
             """,
             (email.strip(),),
@@ -111,16 +135,17 @@ def get_mock_university_account_by_email(email):
         connection.close()
 
 
-def save_mock_university_account(account_data):
-    """Save mock university account if it does not already exist."""
+def save_university_account(account_data):
+    """Save university account if it does not already exist."""
 
     connection = connect_db()
 
     try:
         # Insert account only when the email does not already exist
+        # Using IGNORE for safer startup seeding
         connection.execute(
             """
-            INSERT OR REPLACE INTO MockUniversityAccount
+            INSERT OR IGNORE INTO UniversityAccount
             (email, password_hash, full_name, role)
             VALUES (?, ?, ?, ?)
             """,
