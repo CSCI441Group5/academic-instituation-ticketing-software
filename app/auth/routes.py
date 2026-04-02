@@ -110,6 +110,9 @@ def new_ticket():
                     "category": category,
                     "description": description,
                     "attachment": attachment or None,
+                    "requester_account_id": session.get(
+                        "mock_university_account_id"
+                    ),
                     "status": "Pending",
                 }
             )
