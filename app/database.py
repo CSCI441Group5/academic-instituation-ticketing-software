@@ -101,6 +101,19 @@ def save_ticket(ticket_data):
         connection.close()
 
 
+def get_ticket_count():
+    """Return the current number of ticket rows."""
+
+    connection = connect_db()
+
+    try:
+        cursor = connection.execute("SELECT COUNT(*) AS count FROM tickets")
+        row = cursor.fetchone()
+        return row["count"]
+    finally:
+        connection.close()
+
+
 def get_university_account_by_email(email):
     """Retrieve university account by email address."""
 
