@@ -2,11 +2,11 @@
 
 from werkzeug.security import check_password_hash
 import app.database
-from app.model import MockUniversityAccount
+from app.model import UniversityAccount
 
 
-def authenticate_mock_university_account(email, password):
-    """Authenticate user against the mock university account table."""
+def authenticate_university_account(email, password):
+    """Authenticate user against the university account table."""
 
     # Normalize email input before lookup so matching is consistent
     normalized_email = email.strip().lower()
@@ -15,15 +15,15 @@ def authenticate_mock_university_account(email, password):
     if not normalized_email or not password:
         return None, "Enter your Parkfield email address and password."
 
-    # Load the submitted account email from the mock university table
-    account_row = app.database.get_mock_university_account_by_email(
+    # Load the submitted account email from the university account table
+    account_row = app.database.get_university_account_by_email(
         normalized_email
     )
 
     if account_row is None:
         return None, "Incorrect email address or password."
 
-    account = MockUniversityAccount.from_row(account_row)
+    account = UniversityAccount.from_row(account_row)
 
     # Compare the submitted password to the stored hash
     if not check_password_hash(account.password_hash, password):

@@ -1,4 +1,4 @@
-"""Default mock university accounts used by the local login flow."""
+"""Default university accounts used by the local login flow."""
 
 from werkzeug.security import generate_password_hash
 
@@ -48,8 +48,8 @@ def build_seeded_accounts():
     ]
 
 
-def seed_mock_university_accounts():
+def seed_university_accounts():
     """Insert the default accounts when they are missing."""
 
     for account_data in build_seeded_accounts():
-        app.database.save_mock_university_account(account_data)
+        app.database.save_university_account(account_data)

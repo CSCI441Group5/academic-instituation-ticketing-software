@@ -27,10 +27,10 @@ def _ensure_schema(connection: sqlite3.Connection) -> None:
         """
     )
 
-    # Create mock university accounts table
+    # Create university accounts table
     connection.execute(
         """
-        CREATE TABLE IF NOT EXISTS MockUniversityAccount (
+        CREATE TABLE IF NOT EXISTS UniversityAccount (
             id INTEGER PRIMARY KEY AUTOINCREMENT,      -- unique account ID
             email TEXT NOT NULL UNIQUE,                -- university email
             password_hash TEXT NOT NULL,
@@ -98,8 +98,8 @@ def save_ticket(ticket_data):
         connection.close()
 
 
-def get_mock_university_account_by_email(email):
-    """Retrieve mock university account by email address."""
+def get_university_account_by_email(email):
+    """Retrieve university account by email address."""
 
     connection = connect_db()
 
@@ -108,7 +108,7 @@ def get_mock_university_account_by_email(email):
         cursor = connection.execute(
             """
             SELECT id, email, password_hash, full_name, role
-            FROM MockUniversityAccount
+            FROM UniversityAccount
             WHERE lower(email) = lower(?)
             """,
             (email.strip(),),
@@ -119,8 +119,8 @@ def get_mock_university_account_by_email(email):
         connection.close()
 
 
-def save_mock_university_account(account_data):
-    """Save mock university account if it does not already exist."""
+def save_university_account(account_data):
+    """Save university account if it does not already exist."""
 
     connection = connect_db()
 
@@ -129,7 +129,7 @@ def save_mock_university_account(account_data):
         # Using IGNORE for safer startup seeding
         connection.execute(
             """
-            INSERT OR IGNORE INTO MockUniversityAccount
+            INSERT OR IGNORE INTO UniversityAccount
             (email, password_hash, full_name, role)
             VALUES (?, ?, ?, ?)
             """,
