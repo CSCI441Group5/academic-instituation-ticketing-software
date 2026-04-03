@@ -27,7 +27,6 @@ def _ensure_schema(connection: sqlite3.Connection) -> None:
             )
             """
 )
-    )
 
     # Create university accounts table
     connection.execute(
