@@ -16,14 +16,14 @@ def _ensure_schema(connection: sqlite3.Connection) -> None:
     connection.execute(
         """
         CREATE TABLE IF NOT EXISTS tickets (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,               -- unique ticket ID
-            title TEXT NOT NULL,                                -- short ticket summary
-            category TEXT NOT NULL,                             -- type of issue
-            description TEXT NOT NULL,                          -- details about the problem
-            attachment TEXT,                                    -- file path or attachment reference
-            requester_account_id INTEGER,                       -- linked university account
-            status TEXT NOT NULL DEFAULT 'Pending',             -- ticket state (default = Pending)
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP  -- auto timestamp
+            id INTEGER PRIMARY KEY AUTOINCREMENT,               # unique ticket ID
+            title TEXT NOT NULL,                                # short ticket summary
+            category TEXT NOT NULL,                             # type of issue
+            description TEXT NOT NULL,                          # details about the problem
+            attachment TEXT,                                    # file path or attachment reference
+            requester_account_id INTEGER,                       # linked university account
+            status TEXT NOT NULL DEFAULT 'Pending',             # ticket state (default = Pending)
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP  # auto timestamp
         )
         """
     )
@@ -179,7 +179,7 @@ def update_ticket(ticket_id, status, description=""):
         connection.close()
 
 
-def get_ticket(ticket_id):
+def get_ticket(ticket_id,):
     """Retrieve ticket data."""
 
     try:
@@ -187,7 +187,7 @@ def get_ticket(ticket_id):
 
         cursor = connection.execute(
             "SELECT * FROM tickets WHERE id = ?",
-            (ticket_id)
+            (ticket_id,)
         )
 
         return cursor.fetchone()
