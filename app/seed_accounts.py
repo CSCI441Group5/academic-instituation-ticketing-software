@@ -14,42 +14,49 @@ def build_seeded_accounts():
             "password_hash": generate_password_hash("password"),
             "full_name": "Amy",
             "role": "student",
+            "department": ""
         },
         {
             "email": "student2@parkfield.edu",
             "password_hash": generate_password_hash("password"),
             "full_name": "Bob",
             "role": "student",
+            "department": ""
         },
         {
             "email": "staff1@parkfield.edu",
             "password_hash": generate_password_hash("password"),
             "full_name": "Carl",
             "role": "staff",
+            "department": "IT"
         },
         {
             "email": "staff2@parkfield.edu",
             "password_hash": generate_password_hash("password"),
             "full_name": "Dana",
             "role": "staff",
+            "department": "Facilities"
         },
         {
             "email": "manager1@parkfield.edu",
             "password_hash": generate_password_hash("password"),
             "full_name": "Evan",
             "role": "manager",
+            "department": "Academic Support"
         },
         {
             "email": "manager2@parkfield.edu",
             "password_hash": generate_password_hash("password"),
             "full_name": "Fred",
             "role": "manager",
+            "department": ""
         },
         {
             "email": "faculty1@parkfield.edu",
             "password_hash": generate_password_hash("password"),
             "full_name": "Susan",
             "role": "faculty",
+            "department": ""
         }
     ]
 

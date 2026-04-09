@@ -22,13 +22,13 @@ def authenticate_university_account(email, password):
     )
 
     if account_row is None:
-        return None, "Incorrect email address or password."
+        return None, "Incorrect email address."
 
     # Convert the raw database row into the account model used by the route layer
     account = UniversityAccount.from_row(account_row)
 
     # Compare the submitted password to the stored hash
     if not check_password_hash(account.password_hash, password):
-        return None, "Incorrect email address or password."
+        return None, "Incorrect password."
 
     return account, None

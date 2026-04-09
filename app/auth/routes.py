@@ -51,8 +51,13 @@ def login_submit():
     session["user_email"] = account.email
     session["user_full_name"] = account.full_name
     session["user_role"] = account.role
+    session["department"] = account.department
 
-    return redirect(url_for("auth.dashboard"))
+    if(account.role == "student"):
+        return redirect(url_for("auth.dashboard"))
+    else:
+        return redirect(url_for("auth.staff_dashboard"))
+
 
 
 @auth_bp.post("/logout")
@@ -122,7 +127,7 @@ def get_ticket_data(department = None):
         # Filter helper narrows the list after the query runs
         filtered = app.tickets.search_tickets(
             tickets,
-            (status_filter, category_filter, date_before, date_after)
+            (status_filter, category_filter, date_before, date_after, department)
         )
 
     finally:
