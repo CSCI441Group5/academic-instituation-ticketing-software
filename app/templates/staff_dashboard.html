@@ -2,25 +2,12 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <title>Dashboard - Automated School Ticketing System</title>
+        <title>Staff Dashboard - Automated School Ticketing System</title>
+        <h2>Signed in as: {{ session.get("user_full_name") }} ({{session.get("user_role") }}) ({{session.get("user_account_id") }})</h2>
         <!-- Loads the CSS file from Flask’s static folder -->
     </head>
     <body>
-        <h2>
-            Signed in as: {{ session.get("user_full_name") }} ({{session.get("user_role") }}) ({{session.get("user_account_id") }})
-            <!-- Remove "({{session.get("user_account_id") }})" before testing-->
-        </h2>
-        <form action="{{ url_for('auth.logout') }}" method="POST">
-            <button type="submit">Sign Out</button>
-        </form>
-
-        <h1>My Tickets</h1>
-        <p>
-            <a href="{{ url_for('auth.new_ticket') }}">
-                <button type="button">Create New Ticket</button>
-            </a>
-        </p>
-
+        <h1>User Tickets</h1>
         <form method="get" id="filters">
             <p>Filter By:</p>
             <div>
@@ -92,9 +79,7 @@
                 <p>Status: {{ ticket["status"] }}</p>
                 <p>Category: {{ ticket["category"] }}</p>
                 <p>Description: {{ ticket["description"] }}</p>
-                {% if session.get("user_role") != "student" %}
-                    <button onclick="window.location='?edit={{ ticket.id }}'">Edit</button>
-                {% endif %}
+                <button onclick="window.location='?edit={{ ticket.id }}'">Edit</button>
             {% endif %}
         {% endfor %} {% else %}
             <!-- Shown when no tickets have been submitted yet -->

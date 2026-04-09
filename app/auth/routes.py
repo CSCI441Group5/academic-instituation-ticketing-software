@@ -64,8 +64,26 @@ def logout():
 
 @auth_bp.route("/dashboard")
 def dashboard():
-    # Reads tickets from the database and applies optional filters from the page
-    # Staff and managers see all tickets, students only see their own
+    session_data = get_ticket_data()
+    return render_template("dashboard.html", tickets=session_data[0],
+                           status_filter=session_data[1],
+                           category_filter=session_data[2],
+                           date_before=session_data[3],
+                           date_after=session_data[4])
+    
+@auth_bp.route("/staff_dashboard")
+def staff_dashboard():
+    department = session.get("department")
+    print("Session Department: ", department)
+    session_data = get_ticket_data(department)
+    return render_template("staff_dashboard.html", tickets=session_data[0],
+                           status_filter=session_data[1],
+                           category_filter=session_data[2],
+                           date_before=session_data[3],
+                           date_after=session_data[4])
+
+def get_ticket_data(department = None):
+    # Pull all tickets from database so dashboard can render current data
     connection = app.database.connect_db()
 
     status_filter = request.args.get("status_filter", "")
