@@ -4,10 +4,18 @@
 # Used to read environmental variables
 import os
 from flask import Flask, redirect, url_for
+import re
 
 def create_app():
     # Creates and configures the Flask app, then registers blueprints
     app = Flask(__name__)
+
+
+    # Adding a regex test to use in the dashboards to protect against invalid strings
+    def regex_test(value, pattern):
+        return re.match(pattern, value) is not None
+    
+    app.jinja_env.tests['regex'] = regex_test
 
      # Set Flask SECRET_KEY from environment variable
      # If it’s not set, it can cause issues, so use a temporary fallback

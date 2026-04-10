@@ -4,6 +4,9 @@
         <meta charset="UTF-8" />
         <title>Staff Dashboard - Automated School Ticketing System</title>
         <h2>Signed in as: {{ session.get("user_full_name") }} ({{session.get("user_role") }}) ({{session.get("user_account_id") }})</h2>
+        <form action="{{ url_for('auth.logout') }}" method="POST">
+            <button type="submit">Sign Out</button>
+        </form>
         <!-- Loads the CSS file from Flask’s static folder -->
     </head>
     <body>
@@ -34,10 +37,16 @@
             <div>
                 <p>Date:</p>
                 <label>After:</label>
-                <input type="date" id="date_after" name="date_after" value="{{ date_after if date_after else '' }}">
+                <input type="date" id="date_after" name="date_after" value=
+                {%if date_after is regex('\d{4}-\d{2}-\d{2}$') %}
+                    {{date_after}}
+                {%endif%}>
 
                 <label>Before:</label>
-                <input type="date" id="date_before" name="date_before" value="{{ date_before if date_before else '' }}">
+                <input type="date" id="date_before" name="date_before" value=
+                {%if date_before is regex('\d{4}-\d{2}-\d{2}$') %}
+                    {{date_before}}
+                {%endif%}>
             </div>
             <button type="submit">Filter</button>
         </p>

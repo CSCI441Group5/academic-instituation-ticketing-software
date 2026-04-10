@@ -6,7 +6,6 @@ import app.auth.service
 import app.database
 import app.tickets
 
-
 # Create a blueprint named "auth"
 # The name is used for URL building (url_for("auth.login"))
 auth_bp = Blueprint("auth", __name__)
@@ -133,6 +132,9 @@ def get_ticket_data(department = None):
     finally:
         # Close DB connection after the dashboard data is loaded
         connection.close()
+
+    print("Date Before: ", date_before)
+    print("Date After: ", date_after)
 
     return render_template(
         "dashboard.html",
