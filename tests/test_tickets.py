@@ -5,39 +5,9 @@ import app.database as database
 
 # Covers TC-4 - TC-9, TC-13, TC-15
 
-# Helper function for looking up the seeded account ID by email
-# Tickets are linked to requester_account_id, so several tests need this
-def account_id(email):
-    account = database.get_university_account_by_email(email)
-    assert account is not None
-    return account["id"]
-
-
-# Helper function for adding test tickets directly to the temporary database
-def create_ticket(
-    title,
-    category,
-    description,
-    requester_email,
-    status="Pending",
-    claimed_by="",
-):
-    return database.save_ticket(
-        {
-            "title": title,
-            "category": category,
-            "description": description,
-            "attachment": None,
-            "requester_account_id": account_id(requester_email),
-            "status": status,
-            "claimed_by": claimed_by,
-        }
-    )
-
-
 # TC-4: Valid Ticket Submission
 # Verifies that a ticket with valid required fields is accepted and stored correctly
-def test_post_new_ticket_valid_student_request_saves_ticket(client, login, app):
+def test_post_new_ticket_valid_student_request_saves_ticket(client, login, app, account_id,):
     # Sign in as a student because new tickets should be linked to the
     # currently logged-in requester
     login("student1@parkfield.edu")
@@ -157,7 +127,7 @@ def test_post_new_ticket_invalid_attachment_type_does_not_save_ticket(client, lo
 # TC-7: Correct Ticket Routing
 # Verifies that the routing logic assigns a submitted ticket 
 # to the correct department based on category and *stored routing rules (need to add this later)
-def test_get_staff_dashboard_it_staff_user_shows_only_it_tickets(client, login):
+def test_get_staff_dashboard_it_staff_user_shows_only_it_tickets(client, login, create_ticket,):
     # Create one IT ticket and one Facilities ticket
     create_ticket(
         "IT routing check",
@@ -226,7 +196,7 @@ def test_post_new_ticket_valid_student_request_sets_pending_status(client, login
 
 # TC-9: Authorized Status Update
 # Verifies that support staff can update ticket status successfully
-def test_post_update_ticket_staff_user_updates_status_successfully(client, login):
+def test_post_update_ticket_staff_user_updates_status_successfully(client, login, create_ticket,):
     # Create a ticket first so there is something for the support staff to update
     # Since staff edit their own claimed tickets, assign this ticket to Carl
     ticket_id = create_ticket(
@@ -260,7 +230,7 @@ def test_post_update_ticket_staff_user_updates_status_successfully(client, login
 
 # TC-13: Retrieval of Requester Tickets
 # Verifies that requesters can retrieve their own tickets and view associated history records
-def test_get_dashboard_student_user_shows_only_own_tickets(client, login):
+def test_get_dashboard_student_user_shows_only_own_tickets(client, login, create_ticket,):
     # Create one ticket for student1
     create_ticket(
         "Student one visibility check",
@@ -292,7 +262,7 @@ def test_get_dashboard_student_user_shows_only_own_tickets(client, login):
 
 # TC-15: Staff Ticket Claiming
 # Verifies that support staff can claim an unclaimed ticket from their dashboard
-def test_post_claim_ticket_unclaimed_ticket_sets_claimed_by_staff(client, login):
+def test_post_claim_ticket_unclaimed_ticket_sets_claimed_by_staff(client, login, create_ticket,):
     # Create a ticket first so there is something for the staff member to claim
     ticket_id = create_ticket(
         "Claim check",

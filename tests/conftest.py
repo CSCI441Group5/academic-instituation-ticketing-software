@@ -44,3 +44,58 @@ def login(client):
         )
 
     return _login
+
+
+# Helper used by tests that need a seeded account ID
+# Tickets are linked to requester_account_id, so test tickets need this value
+@pytest.fixture()
+def account_id():
+    def _account_id(email):
+        account = database.get_university_account_by_email(email)
+        assert account is not None
+        return account["id"]
+
+    return _account_id
+
+
+# Helper used by dashboard and ticket tests that need database tickets
+# It creates rows directly so tests can focus on the behavior they are checking
+@pytest.fixture()
+def create_ticket(account_id):
+    def _create_ticket(
+        title,
+        category,
+        description,
+        requester_email,
+        status="Pending",
+        claimed_by="",
+        created_at=None,
+    ):
+        ticket_id = database.save_ticket(
+            {
+                "title": title,
+                "category": category,
+                "description": description,
+                "attachment": None,
+                "requester_account_id": account_id(requester_email),
+                "status": status,
+                "claimed_by": claimed_by,
+            }
+        )
+
+        # Some filter tests need stable dates, so update created_at after insert
+        # when a specific timestamp is provided
+        if created_at is not None:
+            connection = database.connect_db()
+            try:
+                connection.execute(
+                    "UPDATE tickets SET created_at = ? WHERE id = ?",
+                    (created_at, ticket_id),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+
+        return ticket_id
+
+    return _create_ticket
