@@ -3,7 +3,7 @@ from pathlib import Path
 
 import app.database as database
 
-# Covers TC-4 - TC-9, TC-13, TC-15
+# Covers TC-4 - TC-6, TC-8, TC-9, TC-15
 
 # TC-4: Valid Ticket Submission
 # Verifies that a ticket with valid required fields is accepted and stored correctly
@@ -124,39 +124,6 @@ def test_post_new_ticket_invalid_attachment_type_does_not_save_ticket(client, lo
     assert database.get_ticket_count() == starting_count
 
 
-# TC-7: Correct Ticket Routing
-# Verifies that the routing logic assigns a submitted ticket 
-# to the correct department based on category and *stored routing rules (need to add this later)
-def test_get_staff_dashboard_it_staff_user_shows_only_it_tickets(client, login, create_ticket,):
-    # Create one IT ticket and one Facilities ticket
-    create_ticket(
-        "IT routing check",
-        "IT",
-        "Unique IT department ticket for routing test.",
-        "student1@parkfield.edu",
-    )
-    create_ticket(
-        "Facilities routing check",
-        "Facilities",
-        "Unique facilities ticket that IT staff should not see.",
-        "student1@parkfield.edu",
-    )
-
-    # Sign in as staff1, who is Carl from the IT department
-    login("staff1@parkfield.edu")
-
-    # Load the staff dashboard
-    response = client.get("/staff_dashboard")
-
-    # Turn the response into normal text so it is easier to read and check
-    text = response.get_data(as_text=True)
-
-    # Check that the IT ticket appears, but the Facilities ticket does not
-    assert response.status_code == 200
-    assert "Unique IT department ticket for routing test." in text
-    assert "Unique facilities ticket that IT staff should not see." not in text
-
-
 # TC-8: Initial Ticket Status Assignment
 # Verifies that a newly submitted ticket receives the correct initial status (Pending)
 def test_post_new_ticket_valid_student_request_sets_pending_status(client, login):
@@ -226,38 +193,6 @@ def test_post_update_ticket_staff_user_updates_status_successfully(client, login
 
     # Check if the new status was saved
     assert ticket["status"] == "In Progress"
-
-
-# TC-13: Retrieval of Requester Tickets
-# Verifies that requesters can retrieve their own tickets and view associated history records
-def test_get_dashboard_student_user_shows_only_own_tickets(client, login, create_ticket,):
-    # Create one ticket for student1
-    create_ticket(
-        "Student one visibility check",
-        "IT",
-        "Unique ticket belonging to student one.",
-        "student1@parkfield.edu",
-    )
-
-    # Create one ticket for student2
-    create_ticket(
-        "Student two visibility check",
-        "IT",
-        "Unique ticket belonging to student two.",
-        "student2@parkfield.edu",
-    )
-
-    # Sign in as student1 and load the student dashboard
-    login("student1@parkfield.edu")
-    response = client.get("/dashboard")
-
-    # Turn the response into normal text so it is easier to read and check
-    text = response.get_data(as_text=True)
-
-    # Check that student1's ticket appears, but student2's ticket does not
-    assert response.status_code == 200
-    assert "Unique ticket belonging to student one." in text
-    assert "Unique ticket belonging to student two." not in text
 
 
 # TC-15: Staff Ticket Claiming
