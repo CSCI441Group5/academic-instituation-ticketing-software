@@ -91,6 +91,7 @@
     {% if tickets %}
         {% for ticket in tickets %}
             <hr />
+            <p><strong>{{ ticket["title"] }}</strong></p>
             <p>Ticket ID: {{ ticket["id"] }}</p>
             <p>Submission Date: {{ ticket["created_at"] }}</p>
             <p>Status: {{ ticket["status"] }}</p>
