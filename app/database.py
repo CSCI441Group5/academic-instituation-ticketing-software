@@ -43,6 +43,23 @@ def _ensure_schema(connection: sqlite3.Connection) -> None:
        """
     )
 
+    # Create ticket history table if it doesn't exist already
+    # Each row records one visible ticket change for the detail page
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS ticket_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,                 -- unique history ID
+            ticket_id INTEGER NOT NULL,                           -- ticket this event belongs to
+            actor_account_id INTEGER,                             -- account that made the change
+            change_type TEXT NOT NULL,                            -- created status_updated claimed etc
+            old_value TEXT,                                       -- previous value when there is one
+            new_value TEXT,                                       -- new value when there is one
+            notes TEXT,                                           -- plain English description
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP    -- auto timestamp
+        )
+        """
+    )
+
     # Add missing department column to UniversityAccount if it doesn't exist
     cursor = connection.execute("PRAGMA table_info(UniversityAccount)")
     columns = [row[1] for row in cursor.fetchall()]
@@ -111,11 +128,24 @@ def save_ticket(ticket_data):
             ),
         )
 
+        # Save the new ticket ID so the first history row can reference it
+        ticket_id = cursor.lastrowid
+
+        # Add the initial history row for ticket creation
+        _insert_ticket_history(
+            connection,
+            ticket_id=ticket_id,
+            actor_account_id=ticket_data.get("requester_account_id"),
+            change_type="created",
+            new_value=ticket_data.get("status", "Open"),
+            notes="Ticket created.",
+        )
+
         # Save changes
         connection.commit()
 
         # Return ID of the newly created ticket
-        return cursor.lastrowid
+        return ticket_id
     finally:
         # Always close database connection
         connection.close()
@@ -245,14 +275,43 @@ def save_university_account(account_data):
         connection.close()
 
 
-def update_ticket(ticket_id, status, claimed_by=""):
+def update_ticket(ticket_id, status, claimed_by="", actor_account_id=None):
     """Update ticket."""
     try:
         connection = connect_db()
 
+        # Load the current values before updating so history can show what changed
+        ticket = connection.execute(
+            "SELECT status, claimed_by FROM tickets WHERE id = ?",
+            (ticket_id,)
+        ).fetchone()
+
         cursor = connection.execute("UPDATE tickets SET status = ?, claimed_by = ? WHERE id = ?",
                                     (status, claimed_by, ticket_id)
                                     )
+
+        # Only create history rows for fields that actually changed
+        if ticket is not None:
+            if ticket["status"] != status:
+                _insert_ticket_history(
+                    connection,
+                    ticket_id=ticket_id,
+                    actor_account_id=actor_account_id,
+                    change_type="status_updated",
+                    old_value=ticket["status"],
+                    new_value=status,
+                    notes="Ticket status updated.",
+                )
+            if (ticket["claimed_by"] or "") != (claimed_by or ""):
+                _insert_ticket_history(
+                    connection,
+                    ticket_id=ticket_id,
+                    actor_account_id=actor_account_id,
+                    change_type="assignment_updated",
+                    old_value=ticket["claimed_by"] or "Unclaimed",
+                    new_value=claimed_by or "Unclaimed",
+                    notes="Ticket assignment updated.",
+                )
 
         connection.commit()
 
@@ -260,15 +319,33 @@ def update_ticket(ticket_id, status, claimed_by=""):
     finally:
         connection.close()
 
-def claim_ticket(ticket_id, staff_name)-> None:
+def claim_ticket(ticket_id, staff_name, actor_account_id=None)-> None:
     """Claim Ticket"""
     print("Ticket ID: ", ticket_id)
     print("Staff Name: ", staff_name)
     try:
         connection = connect_db()
 
+        # Load the previous owner so the claim history can show the change
+        ticket = connection.execute(
+            "SELECT claimed_by FROM tickets WHERE id = ?",
+            (ticket_id,)
+        ).fetchone()
+
         cursor = connection.execute("UPDATE tickets SET claimed_by = ? WHERE id = ?", (staff_name, ticket_id))
         print(cursor.rowcount)
+
+        # Record a claim only when the owner value is actually changing
+        if ticket is not None and (ticket["claimed_by"] or "") != staff_name:
+            _insert_ticket_history(
+                connection,
+                ticket_id=ticket_id,
+                actor_account_id=actor_account_id,
+                change_type="claimed",
+                old_value=ticket["claimed_by"] or "Unclaimed",
+                new_value=staff_name,
+                notes="Ticket claimed.",
+            )
 
         connection.commit()
 
@@ -288,6 +365,86 @@ def get_ticket(ticket_id,):
         )
 
         return cursor.fetchone()
+    finally:
+        connection.close()
+
+
+def _insert_ticket_history(
+    connection,
+    ticket_id,
+    actor_account_id,
+    change_type,
+    old_value=None,
+    new_value=None,
+    notes=None,
+):
+    # Internal helper that adds a history row using an existing database connection
+    # Used when ticket changes and history logging should commit together
+    connection.execute(
+        """
+        INSERT INTO ticket_history (
+            ticket_id,
+            actor_account_id,
+            change_type,
+            old_value,
+            new_value,
+            notes
+        )
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (ticket_id, actor_account_id, change_type, old_value, new_value, notes),
+    )
+
+
+def add_ticket_history(ticket_id, actor_account_id, change_type, old_value=None, new_value=None, notes=None):
+    # Public helper for adding a standalone ticket history row
+    # Opens and commits its own database connection
+    
+    connection = connect_db()
+
+    try:
+        _insert_ticket_history(
+            connection,
+            ticket_id,
+            actor_account_id,
+            change_type,
+            old_value,
+            new_value,
+            notes,
+        )
+        connection.commit()
+    finally:
+        connection.close()
+
+
+def get_ticket_history(ticket_id):
+    """Retrieve history rows for a ticket."""
+    connection = connect_db()
+
+    try:
+        # Join to UniversityAccount so the page can show who made each change
+        cursor = connection.execute(
+            """
+            SELECT
+                ticket_history.id,
+                ticket_history.ticket_id,
+                ticket_history.actor_account_id,
+                ticket_history.change_type,
+                ticket_history.old_value,
+                ticket_history.new_value,
+                ticket_history.notes,
+                ticket_history.created_at,
+                UniversityAccount.full_name AS actor_name,
+                UniversityAccount.email AS actor_email
+            FROM ticket_history
+            LEFT JOIN UniversityAccount
+                ON ticket_history.actor_account_id = UniversityAccount.id
+            WHERE ticket_history.ticket_id = ?
+            ORDER BY ticket_history.id ASC
+            """,
+            (ticket_id,)
+        )
+        return cursor.fetchall()
     finally:
         connection.close()
 

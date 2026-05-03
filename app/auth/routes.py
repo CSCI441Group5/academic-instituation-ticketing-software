@@ -204,6 +204,44 @@ def view_attachment(ticket_id):
 
     return send_from_directory(upload_dir, filename, as_attachment=False)
 
+
+def can_view_ticket(ticket):
+    # Shared ticket access rule used by the detail/history page
+    user_role = session.get("user_role")
+    user_id = session.get("user_account_id")
+
+    if ticket is None:
+        return False
+    if user_role == "student":
+        return ticket["requester_account_id"] == user_id
+    if user_role == "staff":
+        return ticket["category"] == session.get("department")
+    if user_role == "manager":
+        return True
+    return False
+
+
+@auth_bp.get("/tickets/<int:ticket_id>")
+def ticket_detail(ticket_id):
+    # Load the ticket first so missing tickets return 404
+    ticket = app.database.get_ticket(ticket_id)
+
+    # Only authorized users can view the ticket details and history
+    if ticket is None:
+        abort(404)
+    if not can_view_ticket(ticket):
+        abort(403)
+
+    # Load all history rows for the selected ticket
+    history = app.database.get_ticket_history(ticket_id)
+
+    return render_template(
+        "ticket_detail.html",
+        ticket=ticket,
+        history=history,
+    )
+
+
 @auth_bp.route("/archive")
 def archive():
     # Pull tickets from database so archive page can render closed tickets.
@@ -389,7 +427,14 @@ def update_ticket(ticket_id):
     # Reads the edited fields from the dashboard form
     status = request.form["status"]
     claimed_by = request.form["claimed_by"]
-    app.database.update_ticket(ticket_id, status, claimed_by)
+
+    # Pass the current user's account ID so the update appears in ticket history
+    app.database.update_ticket(
+        ticket_id,
+        status,
+        claimed_by,
+        actor_account_id=session.get("user_account_id"),
+    )
 
     ticket = app.database.get_ticket(ticket_id)
     if ticket is not None and ticket["requester_account_id"]:
@@ -401,7 +446,12 @@ def update_ticket(ticket_id):
 
 @auth_bp.route("/tickets/<int:ticket_id>/claim", methods=["POST"])
 def claim_ticket(ticket_id):
+    # Claim the ticket as the currently signed-in staff user
     staff_name = request.form["user_name"]
     
-    app.database.claim_ticket(ticket_id, staff_name)
+    app.database.claim_ticket(
+        ticket_id,
+        staff_name,
+        actor_account_id=session.get("user_account_id"),
+    )
     return redirect(url_for("auth.staff_dashboard"))
