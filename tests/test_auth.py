@@ -2,6 +2,8 @@ import pytest
 
 # Covers TC-1 - TC-3
 
+# Test naming convention: test_<method_or_route>_<starting_state>_<expected_result>
+
 # TC-1: Successful Authentication Callback Handling
 # Verifies that valid university authentication data creates a logged-in session
 @pytest.mark.parametrize(

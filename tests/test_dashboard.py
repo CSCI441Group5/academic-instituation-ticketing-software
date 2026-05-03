@@ -1,5 +1,7 @@
 # Covers TC-13, TC-16 - TC-19
 
+# Test naming convention: test_<method_or_route>_<starting_state>_<expected_result>
+
 # TC-13: Retrieval of Requester Tickets
 # Verifies that requesters can retrieve only their own active tickets
 def test_get_dashboard_student_user_shows_only_own_active_tickets(client, login, create_ticket):

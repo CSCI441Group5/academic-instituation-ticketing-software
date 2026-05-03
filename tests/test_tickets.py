@@ -5,9 +5,11 @@ import app.database as database
 
 # Covers TC-4 - TC-6, TC-8, TC-9, TC-15
 
+# Test naming convention: test_<method_or_route>_<starting_state>_<expected_result>
+
 # TC-4: Valid Ticket Submission
 # Verifies that a ticket with valid required fields is accepted and stored correctly
-def test_post_new_ticket_valid_student_request_saves_ticket(client, login, app, account_id,):
+def test_post_new_ticket_valid_student_request_saves_ticket(client, login, app, account_id):
     # Sign in as a student because new tickets should be linked to the
     # currently logged-in requester
     login("student1@parkfield.edu")
@@ -163,7 +165,7 @@ def test_post_new_ticket_valid_student_request_sets_pending_status(client, login
 
 # TC-9: Authorized Status Update
 # Verifies that support staff can update ticket status successfully
-def test_post_update_ticket_staff_user_updates_status_successfully(client, login, create_ticket,):
+def test_post_update_ticket_staff_user_updates_status_successfully(client, login, create_ticket):
     # Create a ticket first so there is something for the support staff to update
     # Since staff edit their own claimed tickets, assign this ticket to Carl
     ticket_id = create_ticket(
@@ -197,7 +199,7 @@ def test_post_update_ticket_staff_user_updates_status_successfully(client, login
 
 # TC-15: Staff Ticket Claiming
 # Verifies that support staff can claim an unclaimed ticket from their dashboard
-def test_post_claim_ticket_unclaimed_ticket_sets_claimed_by_staff(client, login, create_ticket,):
+def test_post_claim_ticket_unclaimed_ticket_sets_claimed_by_staff(client, login, create_ticket):
     # Create a ticket first so there is something for the staff member to claim
     ticket_id = create_ticket(
         "Claim check",
