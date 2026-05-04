@@ -169,3 +169,19 @@ hr {
                 box-shadow: 0 0 20px rgba(255, 193, 7, 0.6);
             }
         }
+
+/* ================= HISTORY ================= */
+
+.ticket-detail,
+.ticket-history {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 15px 0;
+    padding: 15px;
+}
+
+.history-entry {
+    border-top: 1px solid var(--border);
+    padding: 10px 0;
+}

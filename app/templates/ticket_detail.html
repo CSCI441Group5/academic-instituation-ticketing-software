@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Ticket Details - Automated School Ticketing System</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+<div class="page-container">
+
+    <!-- Header -->
+    <div class="header">
+        <img src="{{ url_for('static', filename='images/university logo.png') }}" class="logo">
+
+        <h2>
+            Ticket #{{ ticket["id"] }}
+        </h2>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="control-panel">
+        <button id="theme-toggle">Toggle Theme</button>
+        <button id="text-bigger">A+</button>
+        <button id="text-reset">A</button>
+        <button id="text-smaller">A-</button>
+
+        <form action="{{ url_for('auth.logout') }}" method="POST">
+            <button type="submit">Sign Out</button>
+        </form>
+    </div>
+
+    <script src="{{url_for('static', filename='js/theme.js')}}"></script>
+
+    <!-- Navigation -->
+    <div class="button-group">
+        {% if ticket["status"] == "Closed" %}
+            <a href="{{ url_for('auth.archive') }}">
+                <button type="button">Back To Archive</button>
+            </a>
+        {% elif session.get("user_role") in ["staff", "manager"] %}
+            <a href="{{ url_for('auth.staff_dashboard') }}">
+                <button type="button">Back To Dashboard</button>
+            </a>
+        {% else %}
+            <a href="{{ url_for('auth.dashboard') }}">
+                <button type="button">Back To Dashboard</button>
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Ticket Details -->
+    <section class="ticket-detail">
+        <h1>{{ ticket["title"] }}</h1>
+        <p>Ticket ID: {{ ticket["id"] }}</p>
+        <p>Submission Date: {{ ticket["created_at"] }}</p>
+        <p>Status: {{ ticket["status"] }}</p>
+        <p>Category: {{ ticket["category"] }}</p>
+        <p>Claimed By: {{ ticket["claimed_by"] or "Unclaimed" }}</p>
+        <p>Description: {{ ticket["description"] }}</p>
+
+        {% if ticket["attachment"] %}
+            <button type="button" onclick="toggleAttachment('{{ ticket.id }}')">View Attachment</button>
+            <div id="attachment-{{ ticket.id }}" class="attachment-preview">
+                <img src="{{ url_for('auth.view_attachment', ticket_id=ticket.id) }}" alt="Ticket attachment">
+            </div>
+        {% endif %}
+    </section>
+
+    <!-- Ticket History -->
+    <section class="ticket-history">
+        <h2>Ticket History</h2>
+
+        {% if history %}
+            {% for entry in history %}
+                <div class="history-entry">
+                    <p><strong>{{ entry["change_type"] }}</strong></p>
+                    <p>Time: {{ entry["created_at"] }}</p>
+                    <p>Changed By: {{ entry["actor_name"] or "System" }}</p>
+                    {% if entry["old_value"] or entry["new_value"] %}
+                        <p>From: {{ entry["old_value"] or "None" }}</p>
+                        <p>To: {{ entry["new_value"] or "None" }}</p>
+                    {% endif %}
+                    {% if entry["notes"] %}
+                        <p>{{ entry["notes"] }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No history recorded yet.</p>
+        {% endif %}
+    </section>
+
+</div>
+</body>
+</html>
