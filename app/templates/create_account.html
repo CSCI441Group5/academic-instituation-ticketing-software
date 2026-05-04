@@ -13,6 +13,14 @@
         User Account Creation Tool
     </h2>
 
+    {% if success %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("success-modal").style.display = "block";
+        });
+    </script>
+    {% endif %}
+
     <script src="{{url_for('static', filename='js/theme.js')}}"></script>
 
     <form action="{{ url_for('auth.create_new_account') }}" method="POST" id="account_form">
