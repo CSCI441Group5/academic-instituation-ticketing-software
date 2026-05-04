@@ -379,14 +379,12 @@ def new_ticket():
 def create_account():
     return render_template("create_account.html")
 
-@auth_bp.route("/create_new_account", methods = ["GET", "POST"])
+@auth_bp.route("/create_new_account", methods=["GET", "POST"])
 def create_new_account():
-    # Optional UI messages after submission or validation failure
     error = None
     success = request.args.get("success") == "1"
 
     if request.method == "POST":
-        # Pull and sanitize form values
         email = request.form.get("user_name", "").strip()
         password = request.form.get("password", "").strip()
         full_name = request.form.get("full_name", "").strip()
@@ -394,10 +392,8 @@ def create_new_account():
         department = request.form.get("department", "").strip()
 
         if not email or not password or not full_name or not role:
-            # Basic required-field check before DB insert
             error = "Username, Password, Name, and Role are required."
         else:
-            # Save new account
             app.database.save_university_account(
                 {
                     "email": email,
@@ -408,12 +404,16 @@ def create_new_account():
                 }
             )
 
+            # Redirect to same page with success flag
+            return redirect(url_for("auth_bp.create_new_account", success=1))
+
+    # Always return template
     return render_template(
-        "university_login.html",
+        "create_account.html",
         error=error,
         success=success
     )
-
+    
 
 @auth_bp.route("/tickets/<int:ticket_id>/edit", methods=["POST"])
 def edit_ticket(ticket_id):
