@@ -1,5 +1,7 @@
 # Covers TC-13, TC-16 - TC-19
 
+# Some TC's show up more than once because one report test case can have different situations to check
+
 # Test naming convention: test_<method_or_route>_<starting_state>_<expected_result>
 
 # TC-13: Retrieval of Requester Tickets
