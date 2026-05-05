@@ -385,15 +385,20 @@ def create_new_account():
     success = request.args.get("success") == "1"
 
     if request.method == "POST":
-        email = request.form.get("user_name", "").strip()
+        email = request.form.get("email", "").strip()
         password = request.form.get("password", "").strip()
-        full_name = request.form.get("full_name", "").strip()
+
+        first_name = request.form.get("first_name", "").strip()
+        last_name = request.form.get("last_name", "").strip()
+        full_name = first_name + " " + last_name
+
         role = request.form.get("role", "").strip()
         department = request.form.get("department", "").strip()
 
         if not email or not password or not full_name or not role:
             error = "Username, Password, Name, and Role are required."
         else:
+            print("Saving University account data")
             app.database.save_university_account(
                 {
                     "email": email,
@@ -405,7 +410,7 @@ def create_new_account():
             )
 
             # Redirect to same page with success flag
-            return redirect(url_for("auth_bp.create_new_account", success=1))
+            return redirect(url_for("auth.create_new_account", success=1))
 
     # Always return template
     return render_template(

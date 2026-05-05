@@ -16,11 +16,8 @@
     <form action="{{ url_for('auth.create_new_account') }}" method="POST" id="account_form">
             <div id="error_message" style="color: red; display:none"></div>
       
-     <p>
-          <a href="{{ url_for('auth.staff_dashboard') }}">
-            <button type="button">Back to Dashboard</button>
-           </a>
-     </p>
+        <a href="{{ url_for('auth.staff_dashboard') }}"></a>
+        <button type="button">Back to Dashboard</button>
             
             <div>
                 <label>First Name:</label>
@@ -51,9 +48,9 @@
                 </select>
             </div>
 
-            <div id="department" name="department" style="display: none;">
+            <div id="deptDiv" style="display: none;">
                 <label>Department:</label>
-                <select>
+                <select id="department" name="department" >
                     <option value="">None</option>
                     <option value="IT">IT</option>
                     <option value="Facilities">Facilities</option>
@@ -70,7 +67,7 @@
     <script>
             document.getElementById("role").addEventListener("change", function(){
                 const selected = this.value;
-                const deptDiv = document.getElementById("department");
+                const deptDiv = document.getElementById("deptDiv");
 
                 if (selected == "Staff" || selected == "Manager"){
                     deptDiv.style.display = "block";

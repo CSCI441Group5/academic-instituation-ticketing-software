@@ -264,11 +264,11 @@ def save_university_account(account_data):
         params = []
 
         accounts = connection.execute(query, params)
-        for account in accounts:
-            print(account["email"])
-            print(account["password_hash"])
 
         connection.commit()
+
+        for account in accounts:
+            print(f"Account email: {account["email"]}, Account role: {account["role"]}, Account department: {account["department"]}")
 
 
     finally:
@@ -321,8 +321,6 @@ def update_ticket(ticket_id, status, claimed_by="", actor_account_id=None):
 
 def claim_ticket(ticket_id, staff_name, actor_account_id=None)-> None:
     """Claim Ticket"""
-    print("Ticket ID: ", ticket_id)
-    print("Staff Name: ", staff_name)
     try:
         connection = connect_db()
 
@@ -333,7 +331,6 @@ def claim_ticket(ticket_id, staff_name, actor_account_id=None)-> None:
         ).fetchone()
 
         cursor = connection.execute("UPDATE tickets SET claimed_by = ? WHERE id = ?", (staff_name, ticket_id))
-        print(cursor.rowcount)
 
         # Record a claim only when the owner value is actually changing
         if ticket is not None and (ticket["claimed_by"] or "") != staff_name:
