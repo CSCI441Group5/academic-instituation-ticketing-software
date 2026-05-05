@@ -13,13 +13,11 @@
         User Account Creation Tool
     </h2>
 
-    {% if success %}
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            document.getElementById("success-modal").style.display = "block";
-        });
-    </script>
-    {% endif %}
+        {% if success %}
+        <script>
+            alert("Account created successfully!");
+        </script>
+        {% endif %}
 
     <script src="{{url_for('static', filename='js/theme.js')}}"></script>
 
