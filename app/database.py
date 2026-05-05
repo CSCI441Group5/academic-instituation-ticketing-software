@@ -270,7 +270,6 @@ def save_university_account(account_data):
         for account in accounts:
             print(f"Account email: {account["email"]}, Account role: {account["role"]}, Account department: {account["department"]}")
 
-
     finally:
         connection.close()
 

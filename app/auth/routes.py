@@ -111,7 +111,6 @@ def staff_dashboard():
         department = session.get("department")
     session_data = get_ticket_data(department)
 
-    print(staff_names)
     return render_template("staff_dashboard.html", 
                            tickets=session_data[0],
                            status_filter=session_data[1],
@@ -130,14 +129,17 @@ def get_ticket_data(department = None):
     date_before = request.args.get("date_before", "")
     date_after = request.args.get("date_after", "")
 
+    
     try:
         # Session values decide whether to show all tickets or just this user's tickets
         user_role = session.get("user_role")
         user_id = session.get("user_account_id")
-
-        if user_role in ["staff", "manager"]:
+        print(f"User Role: {user_role}")
+        if user_role in ["Staff", "Manager"]:
             # Staff/manager path
             # Loads every ticket so support roles can manage the full queue
+
+            print(f"Staff Department: {department}")
             query = """
                 SELECT id, title, category, description, status, created_at, claimed_by, attachment
                 FROM tickets
