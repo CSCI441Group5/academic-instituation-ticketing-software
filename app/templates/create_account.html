@@ -13,12 +13,6 @@
         User Account Creation Tool
     </h2>
 
-    {% if success %}
-    <script>
-         alert("Account created successfully!");
-     </script>
-    {% endif %}
-
     <form action="{{ url_for('auth.create_new_account') }}" method="POST" id="account_form">
             <div id="error_message" style="color: red; display:none"></div>
       
