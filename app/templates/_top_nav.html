@@ -1,0 +1,154 @@
+<!-- Reusable Jinja template partial for the top navigation bar-->
+
+<!-- Check the user role to decide where the dashboard should link -->
+{% set is_staff_area = session.get("user_role") in ["staff", "manager"] %} {%
+set dashboard_url = url_for("auth.staff_dashboard") if is_staff_area else
+url_for("auth.dashboard") %}
+
+<!-- Top Navigation -->
+<header class="app-top-bar">
+    <div class="top-bar-left">
+        <!-- Opens the side menu with navigation and display settings -->
+        <button
+            class="icon-button"
+            type="button"
+            id="menu-toggle"
+            aria-label="Open menu"
+        >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+
+        <a class="brand-link" href="{{ dashboard_url }}">
+            <img
+                src="{{ url_for('static', filename='images/university logo.png') }}"
+                alt="Parkfield University"
+                class="brand-logo"
+            />
+            <span>Parkfield University</span>
+        </a>
+
+        <span class="top-bar-greeting"
+            >Welcome, {{ session.get("user_full_name") }}!</span
+        >
+    </div>
+
+    <div class="top-bar-actions">
+        <!-- Opens recent ticket history updates -->
+        <button
+            class="icon-button notification-button"
+            type="button"
+            id="notification-toggle"
+            aria-label="View notifications"
+        >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                    d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"
+                ></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="notification-dot"></span>
+        </button>
+
+        <form action="{{ url_for('auth.logout') }}" method="POST">
+            <button class="top-bar-button" type="submit">Sign Out</button>
+        </form>
+    </div>
+</header>
+
+<!-- Menu Drawer -->
+<div class="drawer-backdrop" id="drawer-backdrop"></div>
+<aside class="side-drawer" id="side-drawer" aria-hidden="true">
+    <div class="drawer-header">
+        <h2>Menu</h2>
+        <button
+            class="icon-button"
+            type="button"
+            id="menu-close"
+            aria-label="Close menu"
+        >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18 6 6 18M6 6l12 12"></path>
+            </svg>
+        </button>
+    </div>
+
+    <nav class="drawer-nav">
+        <a href="{{ dashboard_url }}">Dashboard</a>
+        <!-- Students can create tickets, while staff use the staff dashboard queue -->
+        {% if not is_staff_area %}
+        <a href="{{ url_for('auth.new_ticket') }}">Create New Ticket</a>
+        {% endif %}
+        <a href="{{ url_for('auth.archive') }}">Archive</a>
+        {% if is_staff_area %}
+        <a href="{{ url_for('auth.create_account') }}">Account Creation Tool</a>
+        {% endif %}
+    </nav>
+
+    <div class="drawer-section">
+        <h3>Display</h3>
+        <button type="button" id="theme-toggle">Toggle Theme</button>
+        <div class="text-size-controls">
+            <button type="button" id="text-smaller">A-</button>
+            <button type="button" id="text-reset">A</button>
+            <button type="button" id="text-bigger">A+</button>
+        </div>
+    </div>
+</aside>
+
+<!-- Notification Panel -->
+<section class="notification-panel" id="notification-panel" aria-hidden="true">
+    <h2>Ticket Updates</h2>
+
+    <!-- Recent history is newest first and each ticket number links to its history page -->
+    {% if recent_history is defined and recent_history %} {% for entry in
+    recent_history %}
+    <div class="notification-item">
+        {% if entry["change_type"] == "created" %}
+        <span
+            ><a
+                href="{{ url_for('auth.ticket_detail', ticket_id=entry['ticket_id']) }}"
+                ><strong>Ticket #{{ entry["ticket_id"] }}</strong></a
+            >
+            has been created.</span
+        >
+        {% elif entry["change_type"] == "status_updated" %}
+        <span
+            ><a
+                href="{{ url_for('auth.ticket_detail', ticket_id=entry['ticket_id']) }}"
+                ><strong>Ticket #{{ entry["ticket_id"] }}</strong></a
+            >
+            status changed to {{ entry["new_value"] }}.</span
+        >
+        {% elif entry["change_type"] == "claimed" %}
+        <span
+            ><a
+                href="{{ url_for('auth.ticket_detail', ticket_id=entry['ticket_id']) }}"
+                ><strong>Ticket #{{ entry["ticket_id"] }}</strong></a
+            >
+            was claimed by {{ entry["new_value"] }}.</span
+        >
+        {% elif entry["change_type"] == "assignment_updated" %}
+        <span
+            ><a
+                href="{{ url_for('auth.ticket_detail', ticket_id=entry['ticket_id']) }}"
+                ><strong>Ticket #{{ entry["ticket_id"] }}</strong></a
+            >
+            assignment changed to {{ entry["new_value"] }}.</span
+        >
+        {% else %}
+        <span
+            ><a
+                href="{{ url_for('auth.ticket_detail', ticket_id=entry['ticket_id']) }}"
+                ><strong>Ticket #{{ entry["ticket_id"] }}</strong></a
+            >
+            has been updated.</span
+        >
+        {% endif %}
+        <small>{{ entry["created_at"] }}</small>
+    </div>
+    {% endfor %} {% else %}
+    <p>No ticket updates yet.</p>
+    {% endif %}
+</section>
