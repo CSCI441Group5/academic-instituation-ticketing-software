@@ -256,20 +256,7 @@ def save_university_account(account_data):
         # Insert account only when the email does not already exist
         # Using IGNORE for safer startup seeding
         connection.execute(query, params)
-
-        query = """
-                SELECT * FROM UniversityAccount
-                """
-        
-        params = []
-
-        accounts = connection.execute(query, params)
-
         connection.commit()
-
-        for account in accounts:
-            print(f"Account email: {account["email"]}, Account role: {account["role"]}, Account department: {account["department"]}")
-
     finally:
         connection.close()
 
