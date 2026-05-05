@@ -8,31 +8,10 @@
 </head>
 
 <body>
+<!-- Shared top navigation, menu drawer, and notification bell -->
+{% include "_top_nav.html" %}
+
 <div class="page-container">
-
-    <!-- Header -->
-    <div class="header">
-        <img src="{{ url_for('static', filename='images/university logo.png') }}" class="logo">
-
-        <h2>
-            Ticket #{{ ticket["id"] }}
-        </h2>
-    </div>
-
-    <!-- Control Panel -->
-    <div class="control-panel">
-        <button id="theme-toggle">Toggle Theme</button>
-        <button id="text-bigger">A+</button>
-        <button id="text-reset">A</button>
-        <button id="text-smaller">A-</button>
-
-        <form action="{{ url_for('auth.logout') }}" method="POST">
-            <button type="submit">Sign Out</button>
-        </form>
-    </div>
-
-    <script src="{{url_for('static', filename='js/theme.js')}}"></script>
-
     <!-- Navigation -->
     <div class="button-group">
         {% if ticket["status"] == "Closed" %}
@@ -75,15 +54,25 @@
         {% if history %}
             {% for entry in history %}
                 <div class="history-entry">
-                    <p><strong>{{ entry["change_type"] }}</strong></p>
-                    <p>Time: {{ entry["created_at"] }}</p>
-                    <p>Changed By: {{ entry["actor_name"] or "System" }}</p>
-                    {% if entry["old_value"] or entry["new_value"] %}
-                        <p>From: {{ entry["old_value"] or "None" }}</p>
-                        <p>To: {{ entry["new_value"] or "None" }}</p>
+                    {% if entry["change_type"] == "created" %}
+                        <p><strong>Ticket created.</strong></p>
+                    {% elif entry["change_type"] == "status_updated" %}
+                        <p><strong>Status changed to {{ entry["new_value"] }}.</strong></p>
+                    {% elif entry["change_type"] == "claimed" %}
+                        <p><strong>Ticket claimed by {{ entry["new_value"] }}.</strong></p>
+                    {% elif entry["change_type"] == "assignment_updated" %}
+                        <p><strong>Assignment changed to {{ entry["new_value"] }}.</strong></p>
+                    {% else %}
+                        <p><strong>Ticket updated.</strong></p>
                     {% endif %}
-                    {% if entry["notes"] %}
-                        <p>{{ entry["notes"] }}</p>
+                    <p>{{ entry["actor_name"] or "System" }} · {{ entry["created_at"] }}</p>
+                    {% if entry["old_value"] or entry["new_value"] %}
+                        {% if entry["old_value"] %}
+                            <p>From: {{ entry["old_value"] }}</p>
+                        {% endif %}
+                        {% if entry["new_value"] %}
+                            <p>To: {{ entry["new_value"] }}</p>
+                        {% endif %}
                     {% endif %}
                 </div>
             {% endfor %}
@@ -93,5 +82,6 @@
     </section>
 
 </div>
+<script src="{{url_for('static', filename='js/theme.js')}}"></script>
 </body>
 </html>

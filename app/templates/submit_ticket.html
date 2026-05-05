@@ -12,34 +12,10 @@
     </head>
 
     <body>
+        <!-- Shared top navigation, menu drawer, and notification bell -->
+        {% include "_top_nav.html" %}
+
         <div class="page-container">
-            <!-- Header -->
-            <div class="header">
-                <img
-                    src="{{ url_for('static', filename='images/university logo.png') }}"
-                    class="logo"
-                />
-
-                <h2>
-                    Signed in as: {{ session.get("user_full_name") }}
-                    ({{session.get("user_role") }})
-                </h2>
-            </div>
-
-            <!-- Control Panel -->
-            <div class="control-panel">
-                <button id="theme-toggle">Toggle Theme</button>
-                <button id="text-bigger">A+</button>
-                <button id="text-reset">A</button>
-                <button id="text-smaller">A-</button>
-
-                <form action="{{ url_for('auth.logout') }}" method="POST">
-                    <button type="submit">Sign Out</button>
-                </form>
-            </div>
-
-            <script src="{{url_for('static', filename='js/theme.js')}}"></script>
-
             <h1>Submit Ticket</h1>
 
             {% if success %}
@@ -95,5 +71,6 @@
                 </a>
             </p>
         </div>
+        <script src="{{url_for('static', filename='js/theme.js')}}"></script>
     </body>
 </html>
