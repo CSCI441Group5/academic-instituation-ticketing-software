@@ -2,20 +2,24 @@ const toggle = document.getElementById("theme-toggle")
 const root = document.documentElement;
 
 if(localStorage.getItem("theme")){
+    // Restore saved theme before the user interacts with the page
     root.setAttribute("data-theme", localStorage.getItem("theme"));
 }
 
-toggle.addEventListener("click", () => { 
-    const current = root.getAttribute("data-theme")
-    const next = current === "dark" ? "light" : "dark";
+if(toggle){
+    toggle.addEventListener("click", () => { 
+        const current = root.getAttribute("data-theme")
+        const next = current === "dark" ? "light" : "dark";
 
-    root.setAttribute("data-theme", next);
-    localStorage.setItem("theme", next);
-});
+        root.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+    });
+}
 
 /* Font Size Toggle Logic */
 const savedSize = localStorage.getItem("font-size");
 if(savedSize){
+    // Restore saved font size before button clicks change it again
     root.style.setProperty("--font-size", savedSize);
 }
 
@@ -77,8 +81,64 @@ if(reset){
     reset.addEventListener("click", () => {
         root.style.setProperty("--font-size", "16px");
         localStorage.setItem("font-size", "16px");
+        updateButtonStates();
     });
 }
+
+/* Menu Drawer Logic */
+const menuToggle = document.getElementById("menu-toggle");
+const menuClose = document.getElementById("menu-close");
+const sideDrawer = document.getElementById("side-drawer");
+const drawerBackdrop = document.getElementById("drawer-backdrop");
+
+function setDrawerOpen(isOpen){
+    if(sideDrawer && drawerBackdrop){
+        sideDrawer.classList.toggle("open", isOpen);
+        drawerBackdrop.classList.toggle("open", isOpen);
+        sideDrawer.setAttribute("aria-hidden", String(!isOpen));
+    }
+}
+
+if(menuToggle){
+    menuToggle.addEventListener("click", () => setDrawerOpen(true));
+}
+
+if(menuClose){
+    menuClose.addEventListener("click", () => setDrawerOpen(false));
+}
+
+if(drawerBackdrop){
+    drawerBackdrop.addEventListener("click", () => setDrawerOpen(false));
+}
+
+/* Notification Panel Logic */
+const notificationToggle = document.getElementById("notification-toggle");
+const notificationPanel = document.getElementById("notification-panel");
+
+function setNotificationOpen(isOpen){
+    if(notificationPanel){
+        notificationPanel.classList.toggle("open", isOpen);
+        notificationPanel.setAttribute("aria-hidden", String(!isOpen));
+    }
+}
+
+if(notificationToggle){
+    notificationToggle.addEventListener("click", (event) => {
+        event.stopPropagation();
+        setNotificationOpen(!notificationPanel.classList.contains("open"));
+    });
+}
+
+document.addEventListener("click", (event) => {
+    if(
+        notificationPanel &&
+        notificationPanel.classList.contains("open") &&
+        !notificationPanel.contains(event.target) &&
+        event.target !== notificationToggle
+    ){
+        setNotificationOpen(false);
+    }
+});
 
 function toggleAttachment(ticketId){
     const attachment = document.getElementById("attachment-" + ticketId);
