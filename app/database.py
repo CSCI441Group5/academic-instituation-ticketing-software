@@ -436,10 +436,57 @@ def get_ticket_history(ticket_id):
             LEFT JOIN UniversityAccount
                 ON ticket_history.actor_account_id = UniversityAccount.id
             WHERE ticket_history.ticket_id = ?
-            ORDER BY ticket_history.id ASC
+            ORDER BY ticket_history.id DESC
             """,
             (ticket_id,)
         )
+        return cursor.fetchall()
+    finally:
+        connection.close()
+
+
+def get_recent_ticket_history(user_role, user_id=None, department=None, limit=5):
+    """Retrieve recent history rows the current user is allowed to see."""
+    connection = connect_db()
+
+    try:
+        # Limit recent updates using the same ticket visibility rules as dashboards
+        query = """
+            SELECT
+                ticket_history.id,
+                ticket_history.ticket_id,
+                ticket_history.actor_account_id,
+                ticket_history.change_type,
+                ticket_history.old_value,
+                ticket_history.new_value,
+                ticket_history.notes,
+                ticket_history.created_at,
+                UniversityAccount.full_name AS actor_name,
+                UniversityAccount.email AS actor_email
+            FROM ticket_history
+            JOIN tickets
+                ON ticket_history.ticket_id = tickets.id
+            LEFT JOIN UniversityAccount
+                ON ticket_history.actor_account_id = UniversityAccount.id
+        """
+        params = []
+
+        if user_role == "student":
+            # Students only see history for tickets they submitted
+            query += " WHERE tickets.requester_account_id = ?"
+            params.append(user_id)
+        elif user_role == "staff":
+            # Staff only see history for tickets routed to their department
+            query += " WHERE tickets.category = ?"
+            params.append(department)
+        elif user_role != "manager":
+            return []
+
+        # Show the newest notification events first
+        query += " ORDER BY ticket_history.id DESC LIMIT ?"
+        params.append(limit)
+
+        cursor = connection.execute(query, params)
         return cursor.fetchall()
     finally:
         connection.close()

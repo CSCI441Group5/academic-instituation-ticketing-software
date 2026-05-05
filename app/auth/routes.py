@@ -87,11 +87,13 @@ def logout():
 @auth_bp.route("/dashboard")
 def dashboard():
     session_data = get_ticket_data()
+    # recent_history is used by the notification bell in the shared top nav
     return render_template("dashboard.html", tickets=session_data[0],
                            status_filter=session_data[1],
                            category_filter=session_data[2],
                            date_before=session_data[3],
-                           date_after=session_data[4])
+                           date_after=session_data[4],
+                           recent_history=get_recent_history())
     
 @auth_bp.route("/staff_dashboard")
 def staff_dashboard():
@@ -111,13 +113,15 @@ def staff_dashboard():
         department = session.get("department")
     session_data = get_ticket_data(department)
 
+    # recent_history is used by the notification bell in the shared top nav
     return render_template("staff_dashboard.html", 
                            tickets=session_data[0],
                            status_filter=session_data[1],
                            category_filter=session_data[2],
                            date_before=session_data[3],
                            date_after=session_data[4],
-                           staff = staff_names)
+                           staff=staff_names,
+                           recent_history=get_recent_history())
 
 # This function is not a route, it does not return a render_template
 def get_ticket_data(department = None):
@@ -134,12 +138,10 @@ def get_ticket_data(department = None):
         # Session values decide whether to show all tickets or just this user's tickets
         user_role = session.get("user_role")
         user_id = session.get("user_account_id")
-        print(f"User Role: {user_role}")
-        if user_role in ["Staff", "Manager"]:
+
+        if user_role in ["staff", "manager"]:
             # Staff/manager path
             # Loads every ticket so support roles can manage the full queue
-
-            print(f"Staff Department: {department}")
             query = """
                 SELECT id, title, category, description, status, created_at, claimed_by, attachment
                 FROM tickets
@@ -174,6 +176,16 @@ def get_ticket_data(department = None):
         connection.close()
 
     return [filtered, status_filter, category_filter, date_before, date_after]
+
+
+def get_recent_history():
+    # Load recent ticket events for the notification bell
+    # Database filtering keeps students, staff, and managers inside their allowed tickets
+    return app.database.get_recent_ticket_history(
+        session.get("user_role"),
+        user_id=session.get("user_account_id"),
+        department=session.get("department"),
+    )
 
 @auth_bp.get("/tickets/<int:ticket_id>/attachment")
 def view_attachment(ticket_id):
@@ -241,6 +253,7 @@ def ticket_detail(ticket_id):
         "ticket_detail.html",
         ticket=ticket,
         history=history,
+        recent_history=get_recent_history(),
     )
 
 
@@ -296,7 +309,9 @@ def archive():
         status_filter=status_filter,
         category_filter=category_filter,
         date_before=date_before,
-        date_after=date_after
+        date_after=date_after,
+        # recent_history is used by the notification bell in the shared top nav
+        recent_history=get_recent_history()
     )
 
 # Handles ticket form display and submission
@@ -375,6 +390,8 @@ def new_ticket():
         error=error,
         success=success,
         ticket_id=ticket_id,
+        # recent_history is used by the notification bell in the shared top nav
+        recent_history=get_recent_history(),
     )
 
 @auth_bp.route("/new_account", methods = ["GET"])
