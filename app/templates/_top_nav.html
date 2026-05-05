@@ -35,6 +35,7 @@ url_for("auth.dashboard") %}
     </div>
 
     <div class="top-bar-actions">
+        {% if not is_staff_area %}
         <!-- Opens recent ticket history updates -->
         <button
             class="icon-button notification-button"
@@ -50,6 +51,7 @@ url_for("auth.dashboard") %}
             </svg>
             <span class="notification-dot"></span>
         </button>
+        {% endif %}
 
         <form action="{{ url_for('auth.logout') }}" method="POST">
             <button class="top-bar-button" type="submit">Sign Out</button>
@@ -97,6 +99,7 @@ url_for("auth.dashboard") %}
     </div>
 </aside>
 
+{% if not is_staff_area %}
 <!-- Notification Panel -->
 <section class="notification-panel" id="notification-panel" aria-hidden="true">
     <h2>Ticket Updates</h2>
@@ -152,3 +155,4 @@ url_for("auth.dashboard") %}
     <p>No ticket updates yet.</p>
     {% endif %}
 </section>
+{% endif %}
