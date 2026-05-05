@@ -16,8 +16,10 @@
     <form action="{{ url_for('auth.create_new_account') }}" method="POST" id="account_form">
             <div id="error_message" style="color: red; display:none"></div>
       
-        <a href="{{ url_for('auth.staff_dashboard') }}"></a>
-        <button type="button">Back to Dashboard</button>
+        <a href="{{ url_for('auth.staff_dashboard') }}">
+            <button type="button">Back to Dashboard</button>
+        </a>
+        
             
             <div>
                 <label>First Name:</label>
