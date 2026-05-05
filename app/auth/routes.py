@@ -377,7 +377,7 @@ def new_ticket():
 
 @auth_bp.route("/new_account", methods = ["GET"])
 def create_account():
-    return render_template("create_account.html")
+    return render_template("create_new_account.html")
 
 @auth_bp.route("/create_new_account", methods=["GET", "POST"])
 def create_new_account():
@@ -409,7 +409,7 @@ def create_new_account():
 
     # Always return template
     return render_template(
-        "create_account.html",
+        "create_new_account.html",
         error=error,
         success=success
     )
