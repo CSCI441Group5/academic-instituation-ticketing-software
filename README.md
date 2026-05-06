@@ -2,8 +2,9 @@
 
 ## Project Overview
 
-This project is a prototype for an automatic school ticket-based system
-to allow for faculty/staff to submit support tickets and to allow for tech managers to manage and settle them.
+This project is a prototype ticketing system for an academic institution.
+Students can submit support tickets, staff can manage tickets routed to their
+department, and managers can oversee tickets across departments.
 
 The system is being developed via an agile-based design.
 
@@ -21,23 +22,26 @@ Run the app:
 
 ## Current Features
 
-- User authentication via university login
-- Submission spot for support tickets
-- IT staff ticket list and status administration
-- Email notification for confirmations
-
-## Planned Features
-
-- Ticket storage
-- Automatic ticket routing
-- Individualized dashboards
-- Search feature for tickets
+- University account login for student, staff, and manager roles
+- Student dashboard for viewing active submitted tickets
+- Staff dashboard for viewing active tickets in the staff member's department
+- Manager dashboard for viewing tickets across all departments
+- Ticket submission with title, category, description, and optional image attachment
+- Category-based routing, where submitted tickets appear in the matching department queue
+- Ticket claiming and ticket status updates for support staff
+- Manager ticket assignment controls
+- Archive page for closed tickets
+- Dashboard and archive filtering by status, category, and date
+- Ticket detail page with ticket history/activity log
+- Notification panel showing recent ticket updates
+- Theme and font-size controls
 
 ## Technology
 
-- Frontend: Python/HTML & CSS
-- Backend: Python/SQL
-- Database: SQL
+- Frontend: HTML, CSS, JavaScript, Jinja templates
+- Backend: Python, Flask
+- Database: SQLite
+- Testing: pytest
 
 ## How to run the project
 
@@ -124,6 +128,22 @@ python3 run.py
 
 ```
 http://127.0.0.1:5000
+```
+
+## Running Tests
+
+After setup, run the automated test suite with:
+
+**macOS / Linux**
+
+```
+./test.sh -q
+```
+
+Or run pytest directly from the virtual environment:
+
+```
+.venv/bin/python -m pytest -q
 ```
 
 ## Troubleshooting
