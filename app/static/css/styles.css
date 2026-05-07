@@ -263,6 +263,61 @@ body {
     object-fit: contain;
 }
 
+/* ================= LOGIN ================= */
+
+.app-login-page {
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+
+.login-menu {
+    width: min(100%, 460px);
+    margin: 0 auto;
+    padding: 32px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-align: center;
+}
+
+#login-header {
+    margin: 0;
+    font-size: 1.6rem;
+    text-align: center;
+}
+
+.login-menu p {
+    margin: 12px 0 0;
+    color: #526070;
+    line-height: 1.5;
+}
+
+#login-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 28px auto 0 auto;
+    padding: 12px 18px;
+    min-height: 44px;
+    background: var(--primary);
+    color: #ffffff;
+    border-radius: 6px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+#login-button:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 6px 14px rgba(31, 60, 136, 0.18);
+}
+
+#login-button:focus-visible {
+    outline: 3px solid rgba(31, 60, 136, 0.25);
+    outline-offset: 3px;
+}
+
 /* ================= CONTROL PANEL ================= */
 
 .control-panel {

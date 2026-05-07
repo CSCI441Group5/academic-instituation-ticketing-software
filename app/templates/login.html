@@ -11,13 +11,20 @@
             href="{{ url_for('static', filename='css/styles.css') }}"
         />
     </head>
-    <body>
-        <section class="login-menu">
-            <h1 id="login-header">Login</h1>
-            <!-- Link users to the separate university login page -->
-            <a href="{{ url_for('auth.university_login') }}" id="login-button">
-                Sign in with University Credentials
-            </a>
-        </section>
+    <body class="app-login-page">
+        <main class="login-menu">
+            <section aria-labelledby="login-header">
+                <h1 id="login-header">Support Ticket Portal</h1>
+                <p>
+                    Sign in to submit requests, view ticket history, or manage
+                    support queues.
+                </p>
+
+                <!-- Link users to the separate university login page -->
+                <a href="{{ url_for('auth.university_login') }}" id="login-button">
+                    Continue to Sign In
+                </a>
+            </section>
+        </main>
     </body>
 </html>
