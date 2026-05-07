@@ -44,9 +44,9 @@
             <div>
                 <label>Role:</label>
                 <select id="role" name="role" required>
-                    <option value="Student">Student</option>
-                    <option value="Staff">Staff</option>
-                    <option value="Manager">Manager</option>
+                    <option value="student">Student</option>
+                    <option value="staff">Staff</option>
+                    <option value="manager">Manager</option>
                 </select>
             </div>
 
@@ -71,7 +71,7 @@
                 const selected = this.value;
                 const deptDiv = document.getElementById("deptDiv");
 
-                if (selected == "Staff" || selected == "Manager"){
+                if (selected == "staff" || selected == "manager"){
                     deptDiv.style.display = "block";
                 }
                 else{
